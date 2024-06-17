@@ -34,12 +34,16 @@ it('can perform advance search', function () {
     $params = [
         'request' => [
             'classIdentifier' => 'Document',
+//            'criteria' => "[Title Block.Number] Equal to '0200-06288-1000' And [Title Block.Rev] Equal to 'C'",
             'criteria' => "[Title Block.Number] contains '1000' And [Title Block.Rev] Equal to 'A'",
             'caseSensitive' => false,
         ],
     ];
 
+
+
     $response = $client->advancedSearch($params);
+
 
     $advanceSearchResponse = new AdvanceSearchResponse($response->response);
 

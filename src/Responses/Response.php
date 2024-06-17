@@ -10,10 +10,13 @@ class Response
     public $table;
 
     public function __construct($data) {
-        $this->messageId = $data->messageId;
-        $this->messageName = $data->messageName;
-        $this->statusCode = $data->statusCode;
-        $this->table = new Table($data->table);
+
+        foreach (get_object_vars($this) as $property => $value) {
+            if (property_exists($data, $property)) {
+                $this->$property = $data->$property;
+            }
+        }
+
     }
 
 

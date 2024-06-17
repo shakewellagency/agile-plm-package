@@ -9,8 +9,10 @@ class Selection
     public $value;
 
     public function __construct($data) {
-        $this->id = $data->id;
-        $this->apiName = $data->apiName;
-        $this->value = $data->value;
+        foreach (get_object_vars($this) as $property => $value) {
+            if (property_exists($data, $property)) {
+                $this->$property = $data->$property;
+            }
+        }
     }
 }

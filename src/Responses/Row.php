@@ -10,10 +10,23 @@ class Row
     public $rowId;
 
     public function __construct($data) {
-        $this->objectReferentId = new ObjectReferentId($data->objectReferentId);
-        $this->additionalRowInfo = $data->additionalRowInfo;
-        $this->any = $this->mapAnyArray($data->any);
-        $this->rowId = $data->rowId;
+        if(property_exists($data, "objectReferentId")) {
+            $this->objectReferentId = new ObjectReferentId($data->objectReferentId);
+        }
+
+        if(property_exists($data, "additionalRowInfo")) {
+            $this->additionalRowInfo = $data->additionalRowInfo;
+        }
+
+        if(property_exists($data, "any")) {
+            $this->any = $this->mapAnyArray($data->any);
+
+        }
+
+        if(property_exists($data, "rowId")) {
+            $this->rowId = $data->rowId;
+        }
+
 
 
     }

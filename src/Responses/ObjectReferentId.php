@@ -14,13 +14,11 @@ class ObjectReferentId
     public $version;
 
     public function __construct($data) {
-        $this->classId = $data->classId;
-        $this->className = $data->className;
-        $this->classDisplayName = $data->classDisplayName;
-        $this->objectId = $data->objectId;
-        $this->objectName = $data->objectName;
-        $this->objectVersion = $data->objectVersion;
-        $this->version = $data->version;
+        foreach (get_object_vars($this) as $property => $value) {
+            if (property_exists($data, $property)) {
+                $this->$property = $data->$property;
+            }
+        }
     }
 
 }

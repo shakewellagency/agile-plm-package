@@ -13,12 +13,10 @@ class TableIdentifier
     public $tableDisplayName;
 
     public function __construct($data) {
-        $this->classId = $data->classId;
-        $this->className = $data->className;
-        $this->objectId = $data->objectId;
-        $this->objectName = $data->objectName;
-        $this->tableId = $data->tableId;
-        $this->tableName = $data->tableName;
-        $this->tableDisplayName = $data->tableDisplayName;
+        foreach (get_object_vars($this) as $property => $value) {
+            if (property_exists($data, $property)) {
+                $this->$property = $data->$property;
+            }
+        }
     }
 }
