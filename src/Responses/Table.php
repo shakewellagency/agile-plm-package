@@ -5,10 +5,11 @@ namespace Shakewell\LaravelAgilePlm\Responses;
 class Table
 {
 
-    public $tableIdentifier;
-    public $row;
+    public TableIdentifier $tableIdentifier;
+    public array $row;
 
     public function __construct($data) {
+
         $this->tableIdentifier = new TableIdentifier($data->tableIdentifier);
 
         if(property_exists($data, "row")) {
@@ -18,9 +19,13 @@ class Table
                 }, $data->row);
             }
             if(is_object($data->row)) {
-                $this->row = new Row($data->row);
+                $this->row[] = new Row($data->row);
             }
+        }else {
+            $this->row = [];
         }
+
+
 
     }
 

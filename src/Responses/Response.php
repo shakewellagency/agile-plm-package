@@ -11,11 +11,22 @@ class Response
 
     public function __construct($data) {
 
-        foreach (get_object_vars($this) as $property => $value) {
-            if (property_exists($data, $property)) {
-                $this->$property = $data->$property;
-            }
+        if (property_exists($data, "messageId")) {
+            $this->messageId = $data->messageId;
         }
+
+        if (property_exists($data, "messageName")) {
+            $this->messageName = $data->messageName;
+        }
+
+        if (property_exists($data, "statusCode")) {
+            $this->statusCode = $data->statusCode;
+        }
+
+        if (property_exists($data, "table")) {
+            $this->table = new Table($data->table);
+        }
+
 
     }
 

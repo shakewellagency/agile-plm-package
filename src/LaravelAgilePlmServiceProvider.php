@@ -2,6 +2,8 @@
 
 namespace Shakewell\LaravelAgilePlm;
 
+use Shakewell\LaravelAgilePlm\Services\AgilePlmService;
+use Shakewell\LaravelAgilePlm\Services\implementation\AgilePlmServiceImpl;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Shakewell\LaravelAgilePlm\Commands\LaravelAgilePlmCommand;
@@ -21,5 +23,13 @@ class LaravelAgilePlmServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasMigration('create_laravel-agile-plm_table')
             ->hasCommand(LaravelAgilePlmCommand::class);
+    }
+
+    public function boot()
+    {
+        $this->app->bind(AgilePlmService::class, AgilePlmServiceImpl::class);
+
+        return parent::boot();
+
     }
 }
