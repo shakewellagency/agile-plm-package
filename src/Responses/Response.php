@@ -2,11 +2,13 @@
 
 namespace Shakewell\LaravelAgilePlm\Responses;
 
+use Shakewell\LaravelAgilePlm\Enums\ResponseStatus;
+
 class Response
 {
     public $messageId;
     public $messageName;
-    public $statusCode;
+    public ResponseStatus $statusCode;
     public $table;
 
     public function __construct($data) {
@@ -20,7 +22,7 @@ class Response
         }
 
         if (property_exists($data, "statusCode")) {
-            $this->statusCode = $data->statusCode;
+            $this->statusCode = ResponseStatus::fromString($data->statusCode);
         }
 
         if (property_exists($data, "table")) {

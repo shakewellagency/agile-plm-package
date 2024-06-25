@@ -9,6 +9,8 @@ class Row
     public $any;
     public $rowId;
 
+    public RowInfo $rowInfo;
+
     public function __construct($data) {
         if(property_exists($data, "objectReferentId")) {
             $this->objectReferentId = new ObjectReferentId($data->objectReferentId);
@@ -18,8 +20,34 @@ class Row
             $this->additionalRowInfo = $data->additionalRowInfo;
         }
 
-        if(property_exists($data, "any")) {
-            $this->any = $this->mapAnyArray($data->any);
+        if(property_exists($data, "any") && is_array($data->any)) {
+            $rowInfo = $data->any;
+
+
+            $lifecyclePhase = is_array($rowInfo) && array_key_exists("lifecyclePhase", $rowInfo)? $rowInfo["lifecyclePhase"]: null;
+            $rev = is_array($rowInfo) && array_key_exists("rev", $rowInfo)? $rowInfo["rev"]: null;
+            $itemType = is_array($rowInfo) && array_key_exists("itemType", $rowInfo )? $rowInfo["itemType"]: null;
+
+
+            $this->rowInfo = new RowInfo(
+                array_key_exists("number", $rowInfo) ? $rowInfo["number"] : null,
+                array_key_exists("description", $rowInfo, ) ? $rowInfo["description"] : null,
+                $lifecyclePhase ? new RowInfoProperty(
+                    property_exists($lifecyclePhase, "listName") ? $lifecyclePhase->listName : null,
+                    property_exists($lifecyclePhase, "selection") ? new Selection($lifecyclePhase->selection) : null,
+                ) : null,
+                $rev ? new RowInfoProperty(
+                    property_exists($rev, "listName") ? $rev->listName : null,
+                    property_exists($rev, "selection") ? new Selection($rev->selection) : null,
+                ): null,
+                $itemType ? new RowInfoProperty(
+                    property_exists($itemType, "listName") ? $itemType->listName : null,
+                    property_exists($itemType, "selection") ? new Selection($itemType->selection) : null,
+                ): null
+            );
+
+
+//            $this->any = $this->mapAnyArray($data->any);
 
         }
 
@@ -32,6 +60,7 @@ class Row
     }
 
     private function mapAnyArray($anyArray) {
+
         $mappedArray = [];
         foreach ($anyArray as $key => $value) {
             if (is_object($value)) {
