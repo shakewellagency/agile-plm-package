@@ -4,9 +4,8 @@ namespace Shakewell\LaravelAgilePlm\Responses;
 
 class Row
 {
-    public $objectReferentId;
+    public ObjectReferentId $objectReferentId;
     public $additionalRowInfo;
-    public $any;
     public $rowId;
 
     public RowInfo $rowInfo;

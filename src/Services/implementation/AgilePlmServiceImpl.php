@@ -14,7 +14,7 @@ use Shakewell\LaravelAgilePlm\Services\AgilePlmService;
 class AgilePlmServiceImpl implements AgilePlmService
 {
 
-    public function searchDocumentByNumberAndRevision($documentNumber, $documentRevision): Response
+    public function searchDocumentByNumberAndRevision($documentNumber, $documentRevision): AgileDocument
     {
 
         $searchEndpoint = "/CoreService/services/Search?wsdl";
@@ -40,9 +40,11 @@ class AgilePlmServiceImpl implements AgilePlmService
 
         $response = $client->advancedSearch($params);
 
+        dd($response);
+
         $searchResponse = (new AdvanceSearchResponse($response->response))->response;
 
-        return $searchResponse;
+        return $this->convertResponseToDocument($searchResponse);
 
     }
 
@@ -72,11 +74,11 @@ class AgilePlmServiceImpl implements AgilePlmService
 
         return new AgileDocument(
             $row->objectReferentId->objectId,
-            $row->any->number,
-            $row->rev->selection->value,
-            $row->any->description,
-            $row->any->lifeCyclePhase->value,
-            $row->any->itemType->value
+            $row->rowInfo->number,
+            $row->rowInfo->rev->selection->value,
+            $row->rowInfo->description,
+            $row->rowInfo->lifecyclePhase->selection->value,
+            $row->rowInfo->itemType->selection->value
         );
     }
 }

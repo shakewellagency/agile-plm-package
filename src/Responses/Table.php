@@ -6,6 +6,10 @@ class Table
 {
 
     public TableIdentifier $tableIdentifier;
+
+    /**
+     * @var Row[]
+     */
     public array $row;
 
     public function __construct($data) {
