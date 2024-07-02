@@ -29,8 +29,8 @@ class Row
 
 
             $this->rowInfo = new RowInfo(
-                array_key_exists("number", $rowInfo) ? $rowInfo["number"] : null,
-                array_key_exists("description", $rowInfo, ) ? $rowInfo["description"] : null,
+                array_key_exists("number", $rowInfo) ? $rowInfo["number"] : "",
+                array_key_exists("description", $rowInfo, ) ? $rowInfo["description"] : "",
                 $lifecyclePhase ? new RowInfoProperty(
                     property_exists($lifecyclePhase, "listName") ? $lifecyclePhase->listName : null,
                     property_exists($lifecyclePhase, "selection") ? new Selection($lifecyclePhase->selection) : null,
