@@ -28,9 +28,16 @@ class Row
             $itemType = is_array($rowInfo) && array_key_exists("itemType", $rowInfo )? $rowInfo["itemType"]: null;
 
 
+            $description = "";
+            if(array_key_exists("description", $rowInfo, )){
+                $description = $rowInfo["description"];
+            }elseif (array_key_exists("descriptionOfChange", $rowInfo, )){
+                $description = $rowInfo["descriptionOfChange"];
+            }
+
             $this->rowInfo = new RowInfo(
                 array_key_exists("number", $rowInfo) ? $rowInfo["number"] : "",
-                array_key_exists("description", $rowInfo, ) ? $rowInfo["description"] : "",
+                $description,
                 $lifecyclePhase ? new RowInfoProperty(
                     property_exists($lifecyclePhase, "listName") ? $lifecyclePhase->listName : null,
                     property_exists($lifecyclePhase, "selection") ? new Selection($lifecyclePhase->selection) : null,
@@ -45,8 +52,6 @@ class Row
                 ): null
             );
 
-
-//            $this->any = $this->mapAnyArray($data->any);
 
         }
 

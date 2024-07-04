@@ -3,16 +3,19 @@
 namespace Shakewell\LaravelAgilePlm\Services\implementation;
 
 use League\CommonMark\Extension\Table\TableRow;
+use Shakewell\LaravelAgilePlm\Entities\AgileChange;
 use Shakewell\LaravelAgilePlm\Entities\AgileDocument;
 use Shakewell\LaravelAgilePlm\Entities\AgileECO;
+use Shakewell\LaravelAgilePlm\Enums\ClassIdentifier;
 use Shakewell\LaravelAgilePlm\Enums\ResponseStatus;
 use Shakewell\LaravelAgilePlm\Responses\AdvanceSearchResponse;
 use Shakewell\LaravelAgilePlm\Responses\Response;
 use Shakewell\LaravelAgilePlm\Responses\Row;
 use Shakewell\LaravelAgilePlm\Responses\Table;
 use Shakewell\LaravelAgilePlm\Services\AgilePlmService;
+use Shakewell\LaravelAgilePlm\Services\AgileSearch;
 
-class AgilePlmServiceImpl implements AgilePlmService
+class AgilePlmServiceImpl extends AgileSearch implements AgilePlmService
 {
 
     function __construct()
@@ -25,26 +28,13 @@ class AgilePlmServiceImpl implements AgilePlmService
 
     }
 
-    public function searchDocumentByNumberAndRevision($documentNumber, $documentRevision): AgileDocument
+    public function searchDocumentByNumberAndRevision($documentNumber, $documentRevision): ?AgileDocument
     {
 
-        $searchEndpoint = "/CoreService/services/Search?wsdl";
+        $response = $this->search(ClassIdentifier::DOCUMENT,
+            "[Title Block.Number] Equal to '$documentNumber' And [Title Block.Rev] Equal to '$documentRevision'");
 
-        $wsdl = config('agile-plm.soap_endpoint') . $searchEndpoint;
-
-        $client = new \SoapClient($wsdl, $this->options);
-
-        $params = [
-            'request' => [
-                'classIdentifier' => 'Document',
-                'criteria' => "[Title Block.Number] contains '$documentNumber' And [Title Block.Rev] Equal to '$documentRevision'",
-                'caseSensitive' => false,
-            ],
-        ];
-
-
-        $response = $client->advancedSearch($params);
-
+        if($response == null) return null;
 
         $searchResponse = (new AdvanceSearchResponse($response->response))->response;
 
@@ -53,129 +43,41 @@ class AgilePlmServiceImpl implements AgilePlmService
     }
 
 
-    public function getDocumentByObjectId($objectNumber, $objectId)
+    public function searchEcoByDocumentNumberAndRevision($documentNumber, $documentRevision)
     {
-        $endpoint = "/CoreService/services/BusinessObject?wsdl";
-
-        $wsdl = config('agile-plm.soap_endpoint') . $endpoint;
-
-        $client = new \SoapClient($wsdl, $this->options);
-
-        $params = [
-            'request' => [
-                'requests' => [
-                    'classIdentifier' => 'Changes',
-                    'objectNumber' => $objectNumber,
-//                    'referenceObjectKey' => $objectId
-                ],
-
-            ]
-        ];
-
-        dump($params);
-
-        $response = $client->getObject($params);
-
-        return $response;
-
-    }
-
-
-    public function searchChangeItemsByDocumentNumberAndRevision($documentNumber, $documentRevision)
-    {
-        $searchEndpoint = "/CoreService/services/Search?wsdl";
-
-        $wsdl = config('agile-plm.soap_endpoint') . $searchEndpoint;
-
-        $client = new \SoapClient($wsdl, $this->options);
-
 
         $searchTerm = $documentNumber . " Rev " . $documentRevision;
 
-        $params = [
-            'request' => [
-                'classIdentifier' => 'ECO',
-                'criteria' => "[Description of Change] contains '$searchTerm'",
-                'caseSensitive' => false,
-            ],
-        ];
+        $response = $this->search(ClassIdentifier::ECO,
+            "[Description of Change] contains '$searchTerm'");
 
-
-        $response = $client->advancedSearch($params);
-
-//        dump($response);
+        if($response == null) return null;
 
         $searchResponse = (new AdvanceSearchResponse($response->response))->response;
 
-//        return $searchResponse;
 
-        return $this->convertResponseToECO($searchResponse);
+        return $this->convertResponseToChange($searchResponse);
     }
 
 
-    private function convertResponseToDocument($response): ?AgileDocument
+
+    public function searchEcrByDocumentNumberAndRevision($documentNumber, $documentRevision)
     {
-        if (!$response instanceof Response) {
-            return null;
-        }
 
-        if ($response->statusCode !== ResponseStatus::SUCCESS) {
-            return null;
-        }
+        $searchTerm = $documentNumber . " Rev " . $documentRevision;
 
-        if (!$response->table instanceof Table) {
-            return null;
-        }
+        $response = $this->search(ClassIdentifier::ECR,
+            "[Description of Change] contains '$searchTerm'");
 
-        if (!is_array($response->table->row) || count($response->table->row) === 0) {
-            return null;
-        }
+        if($response == null) return null;
 
-        if (!$response->table->row[0] instanceof Row) {
-            return null;
-        }
+        $searchResponse = (new AdvanceSearchResponse($response->response))->response;
 
-        $row = $response->table->row[0];
 
-        return new AgileDocument(
-            $row->objectReferentId->objectId,
-            $row->rowInfo->number,
-            $row->rowInfo->rev->selection->value,
-            $row->rowInfo->description,
-            $row->rowInfo->lifecyclePhase->selection->value,
-            $row->rowInfo->itemType->selection->value
-        );
+        return $this->convertResponseToChange($searchResponse);
     }
 
-    private function convertResponseToECO($response): ?AgileECO{
 
-        if (!$response instanceof Response) {
-            return null;
-        }
-
-        if ($response->statusCode !== ResponseStatus::SUCCESS) {
-            return null;
-        }
-
-        if (!$response->table instanceof Table) {
-            return null;
-        }
-
-        if (!is_array($response->table->row) || count($response->table->row) === 0) {
-            return null;
-        }
-
-        if (!$response->table->row[0] instanceof Row) {
-            return null;
-        }
-
-        $row = $response->table->row[0];
-
-        return new AgileECO(
-            $row->rowInfo->number,
-        );
-
-    }
 
 
 }
