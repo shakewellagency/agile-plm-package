@@ -7,12 +7,10 @@ class AgileDocument
 
     public string $id;
     public string $documentNumber;
-
     public string $revision;
+
     public string $description;
-
     public string $lifeCyclePhase;
-
     public string $ItemType;
 
     function __construct($id,  $documentNumber, $revision, $description, $lifeCyclePhase, $ItemType)
@@ -25,7 +23,6 @@ class AgileDocument
         $this->ItemType = $ItemType;
 
     }
-
 
 
 }

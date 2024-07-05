@@ -9,8 +9,6 @@ This is where your description should go. Limit it to a paragraph or two. Consid
 
 ## Support us
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-agile-plm.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-agile-plm)
-
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
 We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
@@ -23,44 +21,80 @@ You can install the package via composer:
 composer require shakewell/laravel-agile-plm
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-agile-plm-migrations"
-php artisan migrate
-```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-agile-plm-config"
+php artisan vendor:publish --tag="agile-plm-config"
 ```
 
 This is the contents of the published config file:
 
 ```php
 return [
+    'soap_endpoint' => env('AGILE_PLM_SOAP_ENDPOINT'),
+    'username' => env('AGILE_PLM_SOAP_USERNAME'),
+    'password' => env('AGILE_PLM_SOAP_PASSWORD'),
 ];
 ```
+Agile PLM SOAP access uses basic authentication.
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-agile-plm-views"
-```
 
 ## Usage
 
+This package contains services that can be injected into the controller via Laravel
+Dependency Injection
+
 ```php
-$laravelAgilePlm = new Shakewell\LaravelAgilePlm();
-echo $laravelAgilePlm->echoPhrase('Hello, Shakewell!');
+use Shakewell\LaravelAgilePlm\Services\AgilePlmService;
+
+public function handle(AgilePlmService $agilePlmService){
+ // Code Here
+}
+```
+The ``` AgoilePlmService``` contains different search methods
+
+### Search for Document using Document Number and Document Revision
+```php
+$results = $agilePlmService->searchDocumentByNumberAndRevision("0200-06288-1000", "C");
+```
+This method will return an  ```AgileDocument``` class with the following properties or ```null``` 
+if no document is found.
+
+```php
+    public string $id;
+    public string $documentNumber;
+    public string $revision;
+    public string $description;
+    public string $lifeCyclePhase;
+    public string $ItemType;
 ```
 
-## Testing
-
-```bash
-composer test
+### Search for ECO using Document Number and Document Revision
+```php
+$results = $agilePlmService->searchEcoByDocumentNumberAndRevision("0200-06288-1000", "C");
 ```
+
+This method will return an  ```AgileChange``` class with the following properties or ```null```
+if no ECO is found.
+```php
+    public string $number;
+    public string $description;
+```
+
+
+### Search for ECR using Document Number and Document Revision
+```php
+$results = $agilePlmService->searchEcrByDocumentNumberAndRevision("0200-06288-1000", "C");
+```
+
+This method will return an  ```AgileChange``` class with the following properties or ```null```
+if no ECO is found.
+```php
+    public string $number;
+    public string $description;
+```
+
 
 ## Changelog
 
